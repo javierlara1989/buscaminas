@@ -2,21 +2,27 @@ from Tkinter import *
 import time, random
 
 
+##clase principal, contiene todas las métodos que hacen funcionar el programa
 class Buscaminas(Frame):
 
+    ##definimos 2 matrices, en una se guardara el arrego de 1 y 0
+    ##y en la otra los numeros de minas circundantes por cuadro
     Matriz = [[0 for _ in range(0, 10)] for _ in range(0, 10)]
     Matriz_prima = [[0 for _ in range(0, 10)] for _ in range(0, 10)]
-  
+
+    #método inicial de la clase, este llama a los demás métodos para hacer funcionar el juego
     def __init__(self, parent):
         Frame.__init__(self, parent, background="white")   
         self.parent = parent
         self.initUI()
-    
+
+    #método inicial de la interface de usuario, se le da el titulo a la ventana
     def initUI(self):
         self.parent.title("Busca minas")
         self.pack(fill=BOTH, expand=1)
         self.menu()
 
+    #menu principal del juego contiene los diferentes niveles de dificultad y el boton salir
     def menu(self):
         self.clear_canvas()
         self.button_easy = Button(self, text="Facil", command= lambda: self.game('e'))
@@ -28,6 +34,7 @@ class Buscaminas(Frame):
         self.button_quit = Button(self, text="Salir", command=self.quit)
         self.button_quit.place(relx=0.5, rely=0.6, anchor=CENTER)
 
+    #método de juego, este método ejecuta el juego según el nivel de dificultad elegido
     def game(self, difficulty):
         self.clear_canvas()
 
@@ -50,10 +57,12 @@ class Buscaminas(Frame):
                 self.btn[x][y] = Button(self ,command= lambda x=x, y=y: self.buttonPush(x, y), text="*")
                 self.btn[x][y].grid(column=y, row=x)
 
+    #método que limpia la ventana de todos sus elementos gráficos
     def clear_canvas(self):
         for child in Frame.winfo_children(self):
             child.destroy()
 
+    #método que llena ambas matrices
     def create_matrix(self, perc, x, y):
         #Genera la matriz de 1 y 0 que representan Mina y No-Mina
         for a in range(0, x):
@@ -90,6 +99,7 @@ class Buscaminas(Frame):
                 else:
                     self.Matriz_prima[d][f] = 'B'
 
+    #método presente en cada boton, actua diferente segun exista una mina o no
     def buttonPush(self, x, y):
         if self.Matriz_prima[x][y] == 'B':
             self.btn[x][y].configure(background='red', text='x')
