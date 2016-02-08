@@ -5,6 +5,8 @@ import time, random
 #clase principal, contiene todas las metodos que hacen funcionar el programa
 class Buscaminas(Frame):
 
+    n_minas = 0
+
     #definimos 2 matrices, en una se guardara el arrego de 1 y 0
     #y en la otra los numeros de minas circundantes por cuadro
     Matriz = [[0 for _ in range(0, 10)] for _ in range(0, 10)]
@@ -23,8 +25,13 @@ class Buscaminas(Frame):
         self.menu()
 
     #menu principal del juego contiene los diferentes niveles de dificultad y el boton salir
-    def menu(self):
+    #si recibe algo en el flag significa que viene de un juego perdido por lo tanto imprime PERDISTE
+    def menu(self, flag=None):
         self.clear_canvas()
+        if flag == 'perdiste':
+            text = Text(self, height=2, width=30, fg="red")
+            text.insert(END, 'Perdiste!!')
+            text.place(relx=0.5, rely=0.1, anchor=CENTER)
         self.button_easy = Button(self, text="Facil", command= lambda: self.game('e'))
         self.button_easy.place(relx=0.5, rely=0.3, anchor=CENTER)
         self.button_medium = Button(self, text="Medio", command= lambda: self.game('m'))
@@ -68,6 +75,9 @@ class Buscaminas(Frame):
         for a in range(0, x):
             for b in range(0, y):
                 self.Matriz[a][b] = random.sample(perc, 1)[0]
+                if self.Matriz[a][b] == 1:
+                    self.n_minas += 1
+        print(self.n_minas)
 
         #Genera la matriz prima, que se llenara con 0 si no hay mina o con un numero del 1 al 9 segun cuantas minas rodeen al espacio
         for d in range(0, x):
@@ -79,9 +89,7 @@ class Buscaminas(Frame):
                         elif f == y:
                             self.Matriz_prima[d][f] = self.Matriz[d+1][f-1] + self.Matriz[d+1][f] + self.Matriz[d][f-1]
                         else:
-                            print(self.Matriz[d+1][f+1], self.Matriz[d+1][f], self.Matriz[d][f+1], self.Matriz[d+1][f-1], self.Matriz[d][f-1])
                             self.Matriz_prima[d][f] = self.Matriz[d+1][f+1] + self.Matriz[d+1][f] + self.Matriz[d][f+1] + self.Matriz[d+1][f-1] + self.Matriz[d][f-1]
-                            print(self.Matriz_prima[d][f])
                     elif d == x:
                         if f == 0:
                             self.Matriz_prima[d][f] = self.Matriz[d-1][f] + self.Matriz[d-1][f+1] + self.Matriz[d][f+1]
@@ -101,9 +109,12 @@ class Buscaminas(Frame):
 
     #metodo presente en cada boton, actua diferente segun exista una mina o no
     def buttonPush(self, x, y):
+        #si el boton es una mina, vuelve al menu principal diciendo que perdiste
         if self.Matriz_prima[x][y] == 'B':
             self.btn[x][y].configure(background='red', text='x')
-            print("Boom perdiste")
+            self.menu('perdiste')
+            self.n_minas = 0
+        #si no es mina, pone el boton verde y muestra el numero de minas que hay al rededor del boton
         else:
             self.btn[x][y].configure(background='green', text=self.Matriz_prima[x][y])
 
